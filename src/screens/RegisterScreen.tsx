@@ -15,6 +15,7 @@ import { userService } from '../api/userService';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 import { useForm } from '../context/useForm';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 type RootStackParamList = {
   Login: undefined;
@@ -63,14 +64,15 @@ export default function RegisterScreen({ navigation }) {
 
   const { form, handleChange, validate, resetForm, errors } = useForm(
     {
-      full_name: '',
+      firstName: '',
+      lastName: '',
       email: '',
-      country: '',
-      age: '',
-      hashed_password: '',
-      agree_to_terms_and_conditions: false,
+      pais: '',
+      edad: '',
+      password: '',
+      terms: false,
     },
-    ['full_name', 'email', 'country', 'hashed_password', 'age'], // campos requeridos
+    ['firstName', 'lastName', 'email', 'pais', 'password', 'edad'], // campos requeridos
   );
 
   // const handleChange = (key: string, value: string | boolean) => {
@@ -112,20 +114,30 @@ export default function RegisterScreen({ navigation }) {
   };
   return (
     <View style={styles.container}>
-      <Image
+      {/* <Image
         source={{
           uri: 'https://images.pexels.com/photos/733416/pexels-photo-733416.jpeg',
         }} // 👈 tu URL aquí
         style={styles.logo}
         resizeMode="contain"
+      /> */}
+      <Icon name="add" size={24} color="#000" />
+      <TextInput
+        placeholder="Nombre completo"
+        value={form.firstName}
+        onChangeText={v => handleChange('firstName', v)}
+        style={[
+          styles.input,
+          errors.firstName && styles.inputError, // 👈 borde rojo si falta
+        ]}
       />
       <TextInput
         placeholder="Nombre completo"
-        value={form.full_name}
-        onChangeText={v => handleChange('full_name', v)}
+        value={form.lastName}
+        onChangeText={v => handleChange('lastName', v)}
         style={[
           styles.input,
-          errors.full_name && styles.inputError, // 👈 borde rojo si falta
+          errors.lastName && styles.inputError, // 👈 borde rojo si falta
         ]}
       />
       <TextInput
@@ -149,13 +161,13 @@ export default function RegisterScreen({ navigation }) {
         <TouchableOpacity
           style={[
             styles.input,
-            errors.country && styles.inputError, // 👈 igual para el dropdown
+            errors.pais && styles.inputError, // 👈 igual para el dropdown
           ]}
           onPress={() => setShowDropdown(!showDropdown)}
         >
-          <Text style={{ color: form.country ? '#000' : '#888' }}>
-            {form.country
-              ? countries.find(c => c.value === form.country)?.label
+          <Text style={{ color: form.pais ? '#000' : '#888' }}>
+            {form.pais
+              ? countries.find(c => c.value === form.pais)?.label
               : 'Selecciona un país'}
           </Text>
         </TouchableOpacity>
@@ -169,7 +181,7 @@ export default function RegisterScreen({ navigation }) {
                 <TouchableOpacity
                   style={styles.option}
                   onPress={() => {
-                    handleChange('country', item.value);
+                    handleChange('pais', item.value);
                     setShowDropdown(false);
                   }}
                 >
@@ -182,15 +194,15 @@ export default function RegisterScreen({ navigation }) {
       </View>
       <TextInput
         placeholder="Edad"
-        value={form.age}
-        onChangeText={v => handleChange('age', v)}
+        value={form.edad}
+        onChangeText={v => handleChange('edad', v)}
         keyboardType="numeric"
-        style={[styles.input, errors.age && styles.inputError]}
+        style={[styles.input, errors.edad && styles.inputError]}
       />
       <TextInput
         placeholder="Contraseña"
-        value={form.hashed_password}
-        onChangeText={v => handleChange('hashed_password', v)}
+        value={form.password}
+        onChangeText={v => handleChange('password', v)}
         secureTextEntry
         style={[styles.input, errors.hashed_password && styles.inputError]}
       />
@@ -198,8 +210,8 @@ export default function RegisterScreen({ navigation }) {
       <View style={styles.switchContainer}>
         <Text>Acepto los términos y condiciones</Text>
         <Switch
-          value={form.agree_to_terms_and_conditions}
-          onValueChange={v => handleChange('agree_to_terms_and_conditions', v)}
+          value={form.terms}
+          onValueChange={v => handleChange('terms', v)}
         />
       </View>
 

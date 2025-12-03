@@ -20,11 +20,13 @@ export const userService = {
   login: async (data: LoginData) => {
     try {
       const response = await client.post('/login', data);
-      const { access_token, ...userData } = response.data; // <--- ✨ ¡Desestructuración Mágica!
+      console.log('✅ Login exitoso:', response);
+      const { token, ...userData } = response.data; // <--- ✨ ¡Desestructuración Mágica!
 
-      if (access_token) {
+      if (token) {
         // 1. Guardar el token para la autenticación de APIs
-        await AsyncStorage.setItem('token', access_token);
+        await AsyncStorage.setItem('token', token);
+        Alert.alert('token', ` ${token}.`);
 
         // 2. Guardar los datos del usuario (ID, full_name, etc.)
         // Necesitas convertir el objeto a string para guardarlo en AsyncStorage

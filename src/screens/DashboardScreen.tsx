@@ -1,5 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Button, StyleSheet, Text, ScrollView } from 'react-native';
+import {
+  View,
+  Button,
+  StyleSheet,
+  Text,
+  ScrollView,
+  Alert,
+} from 'react-native';
 import { PetService } from '../api/petService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PetCard } from '../components/PetCard';
@@ -10,17 +17,19 @@ export default function DashboardScreen({ navigation }) {
   const { getPets, allPets } = PetService();
   const [modalVisible, setModalVisible] = useState(false);
 
-  const fetchUserPets = async () => {
+  const fetchUser = async () => {
     try {
       const userDataString = await AsyncStorage.getItem('userData');
 
       if (userDataString) {
         const userData = JSON.parse(userDataString);
-        const userId = userData.id; // Extrae el ID
+        const userId = userData._id; // Extrae el ID
+
+        Alert.alert('📌 PARSED DATA', JSON.stringify(userData, null, 2));
 
         if (userId) {
-          console.log(`Buscando mascotas para el usuario ID: ${userId}`);
-          await getPets(userId);
+          console.log(`Buscando user para el usuario ID: ${userId}`);
+          // await getPets(userId);
         } else {
           console.error(
             'ID de usuario no encontrado en los datos de AsyncStorage.',
@@ -35,7 +44,7 @@ export default function DashboardScreen({ navigation }) {
   };
 
   useEffect(() => {
-    fetchUserPets();
+    fetchUser();
   }, []);
   return (
     <View style={styles.container}>
@@ -45,7 +54,7 @@ export default function DashboardScreen({ navigation }) {
           ? `Mascotas encontradas: ${allPets.length}`
           : 'Cargando mascotas o ninguna registrada...'}
       </Text> */}
-      <ScrollView style={{ width: '100%' }}>
+      {/* <ScrollView style={{ width: '100%' }}>
         {allPets.map(pet => (
           <PetCard
             key={pet.id}
@@ -55,7 +64,7 @@ export default function DashboardScreen({ navigation }) {
             image={pet.profile_photo}
           />
         ))}
-      </ScrollView>
+      </ScrollView> */}
       <Button
         title="Volver al Login"
         onPress={() => navigation.navigate('Login')}

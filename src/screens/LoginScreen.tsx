@@ -29,9 +29,9 @@ export default function LoginScreen({ navigation }) {
   const { form, handleChange, validate, resetForm, errors } = useForm(
     {
       email: '',
-      hashed_password: '',
+      password: '',
     },
-    ['email', 'hashed_password'], // campos requeridos
+    ['email', 'password'], // campos requeridos
   );
 
   const navigationDashboard =
@@ -43,7 +43,7 @@ export default function LoginScreen({ navigation }) {
       const res = await userService.login({
         ...form,
       });
-      Alert.alert('✅ login exitoso', `Bienvenido ${res.full_name}`);
+      Alert.alert('✅ login exitoso', `Bienvenido ${res.firts_name}`);
 
       // setFormLogin({
       //   email: '',
@@ -85,10 +85,10 @@ export default function LoginScreen({ navigation }) {
       />
       <TextInput
         placeholder="Contraseña"
-        value={form.hashed_password}
-        onChangeText={v => handleChange('hashed_password', v)}
+        value={form.password}
+        onChangeText={v => handleChange('password', v)}
         secureTextEntry
-        style={[styles.input, errors.hashed_password && styles.inputError]}
+        style={[styles.input, errors.password && styles.inputError]}
       />
       <Button title="LOGIN" onPress={handleLogin} />
     </View>
