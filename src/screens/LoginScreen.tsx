@@ -45,10 +45,6 @@ export default function LoginScreen({ navigation }) {
       });
       Alert.alert('✅ login exitoso', `Bienvenido ${res.firts_name}`);
 
-      // setFormLogin({
-      //   email: '',
-      //   hashed_password: '',
-      // });
       resetForm();
 
       navigationDashboard.navigate('Dashboard');
