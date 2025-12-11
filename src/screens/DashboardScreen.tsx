@@ -18,6 +18,47 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 export default function DashboardScreen({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
 
+  // const createShip = async () => {
+  //   try {
+  //     const token = await AsyncStorage.getItem('token');
+  //     const userDataString = await AsyncStorage.getItem('userData');
+
+  //     if (!token || !userDataString) {
+  //       Alert.alert('Error', 'No hay datos de usuario');
+  //       return;
+  //     }
+
+  //     const user = JSON.parse(userDataString);
+  //     const userId = user._id;
+
+  //     const body = {
+  //       ...form,
+  //       owner: userId,
+  //     };
+
+  //     const res = await fetch('http://127.0.0.1:5000/api/ship/createShip', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //       body: JSON.stringify(body),
+  //     });
+
+  //     const data = await res.json();
+
+  //     if (!res.ok) {
+  //       Alert.alert('Error', data.message || 'No se pudo crear el barco');
+  //       return;
+  //     }
+
+  //     Alert.alert('Success', 'Ship created successfully!');
+  //     resetForm();
+  //   } catch (err) {
+  //     console.log(err);
+  //     Alert.alert('Error', 'Hubo un problema creando el barco');
+  //   }
+  // };
   const createShip = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
@@ -36,7 +77,7 @@ export default function DashboardScreen({ navigation }) {
         owner: userId,
       };
 
-      const res = await fetch('http://localhost:5000/api/ship/createShip', {
+      const res = await fetch('http://192.168.0.221:5000/api/ship/createShip', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -45,7 +86,11 @@ export default function DashboardScreen({ navigation }) {
         body: JSON.stringify(body),
       });
 
+      Alert.alert('Debug Status', `${res.status}`);
+
       const data = await res.json();
+
+      Alert.alert('Debug Response', JSON.stringify(data));
 
       if (!res.ok) {
         Alert.alert('Error', data.message || 'No se pudo crear el barco');
@@ -55,8 +100,7 @@ export default function DashboardScreen({ navigation }) {
       Alert.alert('Success', 'Ship created successfully!');
       resetForm();
     } catch (err) {
-      console.log(err);
-      Alert.alert('Error', 'Hubo un problema creando el barco');
+      Alert.alert('ERROR', `${err.message}`);
     }
   };
 
