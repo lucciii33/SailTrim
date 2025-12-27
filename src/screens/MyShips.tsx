@@ -10,11 +10,8 @@ import {
 } from 'react-native';
 import { Ship, Anchor, Plus, Compass } from 'lucide-react-native';
 
-import { PetService } from '../api/petService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { PetCard } from '../components/PetCard';
 import { HeaderDashboard } from '../components/HeaderDashboard';
-import CreatePetFlow from '../components/CreatePetFlow2';
 import { useNavigation } from '@react-navigation/core';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
@@ -88,11 +85,19 @@ export default function Myships({ navigation }) {
         <ScrollView>
           {ships.map(ship => {
             return (
-              <View key={ship._id} style={styles.cardContainer}>
+              <TouchableOpacity
+                key={ship._id}
+                style={styles.cardContainer}
+                onPress={() =>
+                  navigation.navigate('ShipDetail', {
+                    shipId: ship._id,
+                  })
+                }
+              >
                 <View style={styles.card}>
                   <Text>{ship?.name}</Text>
                 </View>
-              </View>
+              </TouchableOpacity>
             );
           })}
         </ScrollView>
