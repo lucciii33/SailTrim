@@ -3,6 +3,8 @@ import { useRoute } from '@react-navigation/native';
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ModalWrapper from '../components/ModalWrapper';
+import { MaintenanceStepOne } from '../components/Maintenance/MaintenanceStepOne';
+import { MaintenanceStepTwo } from '../components/Maintenance/MaintenanceStepTwo';
 
 export default function ShipDetailScreen() {
   const route = useRoute();
@@ -17,7 +19,7 @@ export default function ShipDetailScreen() {
   };
 
   const reduceStep = () => {
-    setCurrentStep(prev => prev + 1);
+    setCurrentStep(prev => prev - 1);
   };
 
   useEffect(() => {
@@ -61,46 +63,37 @@ export default function ShipDetailScreen() {
 
       <ModalWrapper visible={open} onClose={() => setOpen(false)}>
         {currentStep === 1 && (
+          <MaintenanceStepOne
+            nextStep={nextStep}
+            setOpen={setOpen}
+            styles={styles}
+          />
+        )}
+        {currentStep === 2 && (
+          <MaintenanceStepTwo
+            nextStep={nextStep}
+            reduceStep={reduceStep}
+            setOpen={setOpen}
+            styles={styles}
+          />
+        )}
+        {currentStep === 3 && (
           <View style={styles.container}>
-            <View style={styles.box}>
-              <Image
-                source={require('../../assets/boatMan.png')}
-                style={{ width: 200, height: 200 }}
-              />
-            </View>
-
-            <Text style={[styles.color, styles.title1]}>
-              Registro de Mantenimiento Oficial
-            </Text>
-            <Text style={[styles.color, styles.mt10]}>
-              Asegúrate de tener fotos y facturas a mano. Este reporte no es un
-              simple apunte: al guardarlo, se genera una prueba criptográfica
-              que certifica la fecha y el estado real de tu mantenimiento.
-            </Text>
-            <Text style={[styles.color, styles.mt20, styles.title2]}>
-              ¿Por qué te conviene?{' '}
-            </Text>
-            <Text style={[styles.color, styles.mt10]}>
-              Ante cualquier siniestro, el seguro buscará cualquier excusa para
-              no pagar alegando falta de mantenimiento. Con este sistema, tienes
-              una prueba matemática imposible de falsificar. No es tu palabra
-              contra la de ellos; es un certificado digital que garantiza que
-              cumpliste con todo a tiempo.
-            </Text>
-            <Text style={[styles.color, styles.mt20]}>
-              Sin vuelta atrás Para que este documento tenga validez legal ante
-              peritos y autoridades, no puede ser editado ni borrado. Una vez
-              que guardes, la información queda sellada de forma permanente.
-              Revisa todo bien antes de enviar: estás creando la evidencia
-              oficial que te protege.
-            </Text>
-            <Button title="Continuar" onPress={() => nextStep()} />
+            <Text>Paso 3</Text>
+            <Button title="Volver" onPress={() => reduceStep()} />
             <Button title="Cerrar" onPress={() => setOpen(false)} />
           </View>
         )}
-        {currentStep === 2 && (
+        {currentStep === 4 && (
           <View style={styles.container}>
-            <Text>Paso 2</Text>
+            <Text>Paso 4</Text>
+            <Button title="Volver" onPress={() => reduceStep()} />
+            <Button title="Cerrar" onPress={() => setOpen(false)} />
+          </View>
+        )}
+        {currentStep === 5 && (
+          <View style={styles.container}>
+            <Text>Paso 4</Text>
             <Button title="Volver" onPress={() => reduceStep()} />
             <Button title="Cerrar" onPress={() => setOpen(false)} />
           </View>
@@ -136,5 +129,14 @@ const styles = StyleSheet.create({
   title2: {
     fontSize: 24,
     fontWeight: 'bold',
+  },
+  flex: {
+    flexDirection: 'row',
+    gap: 20,
+    alignContent: 'center',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
   },
 });
