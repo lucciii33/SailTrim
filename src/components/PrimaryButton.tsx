@@ -5,15 +5,22 @@ type Props = {
   title: string;
   onPress: () => void;
   disabled?: boolean;
+  selected?: boolean;
 };
 
-export function PrimaryButton({ title, onPress, disabled = false }: Props) {
+export function PrimaryButton({
+  title,
+  onPress,
+  disabled = false,
+  selected = false,
+}: Props) {
   return (
     <Pressable
       onPress={onPress}
       disabled={disabled}
       style={({ pressed }) => [
         styles.button,
+        selected && styles.selected,
         pressed && styles.pressed,
         disabled && styles.disabled,
       ]}
@@ -40,5 +47,9 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
+  },
+  selected: {
+    borderWidth: 2,
+    borderColor: '#FFD700',
   },
 });

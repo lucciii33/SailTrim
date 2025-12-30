@@ -5,6 +5,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import ModalWrapper from '../components/ModalWrapper';
 import { MaintenanceStepOne } from '../components/Maintenance/MaintenanceStepOne';
 import { MaintenanceStepTwo } from '../components/Maintenance/MaintenanceStepTwo';
+import { MaintenanceFlowProvider } from '../context/MaintenanceFlowContext';
+import { MaintenanceStepThree } from '../components/Maintenance/MaintenanceStepThree';
 
 export default function ShipDetailScreen() {
   const route = useRoute();
@@ -62,42 +64,45 @@ export default function ShipDetailScreen() {
       <Button title="Abrir" onPress={() => setOpen(true)} />
 
       <ModalWrapper visible={open} onClose={() => setOpen(false)}>
-        {currentStep === 1 && (
-          <MaintenanceStepOne
-            nextStep={nextStep}
-            setOpen={setOpen}
-            styles={styles}
-          />
-        )}
-        {currentStep === 2 && (
-          <MaintenanceStepTwo
-            nextStep={nextStep}
-            reduceStep={reduceStep}
-            setOpen={setOpen}
-            styles={styles}
-          />
-        )}
-        {currentStep === 3 && (
-          <View style={styles.container}>
-            <Text>Paso 3</Text>
-            <Button title="Volver" onPress={() => reduceStep()} />
-            <Button title="Cerrar" onPress={() => setOpen(false)} />
-          </View>
-        )}
-        {currentStep === 4 && (
-          <View style={styles.container}>
-            <Text>Paso 4</Text>
-            <Button title="Volver" onPress={() => reduceStep()} />
-            <Button title="Cerrar" onPress={() => setOpen(false)} />
-          </View>
-        )}
-        {currentStep === 5 && (
-          <View style={styles.container}>
-            <Text>Paso 4</Text>
-            <Button title="Volver" onPress={() => reduceStep()} />
-            <Button title="Cerrar" onPress={() => setOpen(false)} />
-          </View>
-        )}
+        <MaintenanceFlowProvider>
+          {currentStep === 1 && (
+            <MaintenanceStepOne
+              nextStep={nextStep}
+              setOpen={setOpen}
+              styles={styles}
+            />
+          )}
+          {currentStep === 2 && (
+            <MaintenanceStepTwo
+              nextStep={nextStep}
+              reduceStep={reduceStep}
+              setOpen={setOpen}
+              styles={styles}
+            />
+          )}
+          {currentStep === 3 && (
+            <MaintenanceStepThree
+              nextStep={nextStep}
+              reduceStep={reduceStep}
+              setOpen={setOpen}
+              styles={styles}
+            />
+          )}
+          {currentStep === 4 && (
+            <View style={styles.container}>
+              <Text>Paso 4</Text>
+              <Button title="Volver" onPress={() => reduceStep()} />
+              <Button title="Cerrar" onPress={() => setOpen(false)} />
+            </View>
+          )}
+          {currentStep === 5 && (
+            <View style={styles.container}>
+              <Text>Paso 4</Text>
+              <Button title="Volver" onPress={() => reduceStep()} />
+              <Button title="Cerrar" onPress={() => setOpen(false)} />
+            </View>
+          )}
+        </MaintenanceFlowProvider>
       </ModalWrapper>
     </View>
   );
@@ -138,5 +143,26 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
+  },
+  inputContainer: {
+    marginTop: 16,
+  },
+
+  label: {
+    color: '#f3f3f3',
+    fontSize: 14,
+    marginBottom: 6,
+    fontWeight: '500',
+  },
+
+  input: {
+    backgroundColor: '#ffffff',
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: '#000',
+    borderWidth: 1,
+    borderColor: '#1E90FF',
   },
 });
