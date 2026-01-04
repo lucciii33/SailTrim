@@ -139,15 +139,15 @@ export default function DashboardScreen({ navigation }) {
 
   const navigationMyShips =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const navegateToShips = () => {
-    navigationMyShips.navigate('Myships');
+  const navegateToFridge = () => {
+    navigationMyShips.navigate('Fridge');
   };
 
   return (
     <View style={styles.container}>
       {/* <HeaderDashboard onAddPress={() => setModalVisible(true)} /> */}
       <ScrollView style={{ width: '100%' }}>
-        <View>
+        {/* <View>
           <Text style={styles.title}>Create Your Ship</Text>
           <Text style={styles.subtitle}>
             Each ship has its own secure logbook and maintenance history. You
@@ -239,7 +239,8 @@ export default function DashboardScreen({ navigation }) {
         <TouchableOpacity style={styles.button} onPress={createShip}>
           <Text style={styles.buttonText}>Create Ship</Text>
         </TouchableOpacity>
-        <Button title="test" onPress={() => navegateToShips()} />
+       */}
+        <Button title="test" onPress={() => navegateToFridge()} />
       </ScrollView>
     </View>
   );
