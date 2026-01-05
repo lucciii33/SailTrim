@@ -14,10 +14,35 @@ import { HeaderDashboard } from '../components/HeaderDashboard';
 import { useForm } from '../context/useForm';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { PrimaryButton } from '../components/PrimaryButton';
+import { useFridgeAPI } from '../context/fridgeContext';
 
 export default function DashboardScreen({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
+  const [recipe, setRecipe] = useState('');
+  const { loading, generateRecipe } = useFridgeAPI();
+  const [formData, setFormData] = useState({
+    time: '',
+    style: '',
+  });
 
+  const handleChangeRecipe = (field, value) => {
+    setFormData(prevData => ({
+      ...prevData,
+      [field]: value,
+    }));
+  };
+
+  const handleGenerateRecipe = async () => {
+    try {
+      const recipe = await generateRecipe(formData.time, formData.style);
+      setRecipe(recipe);
+      Alert.alert('Receta Generada', JSON.stringify(recipe, null, 2));
+      // Mostrá la receta en un modal o nueva pantalla
+    } catch (error) {
+      Alert.alert('Error', 'No se pudo generar la receta');
+    }
+  };
   // const createShip = async () => {
   //   try {
   //     const token = await AsyncStorage.getItem('token');
@@ -147,6 +172,47 @@ export default function DashboardScreen({ navigation }) {
     <View style={styles.container}>
       {/* <HeaderDashboard onAddPress={() => setModalVisible(true)} /> */}
       <ScrollView style={{ width: '100%' }}>
+        <TextInput
+          style={styles.input}
+          value={formData.style}
+          onChangeText={v => handleChangeRecipe('style', v)}
+          placeholder="Style"
+        />
+        <TextInput
+          style={styles.input}
+          value={formData.time}
+          keyboardType="numeric"
+          onChangeText={v => handleChangeRecipe('time', v)}
+          placeholder="time"
+        />
+        <View style={{ padding: 10 }}>
+          <PrimaryButton
+            title="🍳 Generar Receta"
+            onPress={handleGenerateRecipe}
+          />
+        </View>
+
+        {recipe && (
+          <View style={styles.recipeCard}>
+            <Text style={styles.recipeTitle}>{recipe.nombre}</Text>
+
+            <Text style={styles.sectionTitle}>Ingredientes:</Text>
+            {recipe.ingredientes?.map((ing, index) => (
+              <Text key={index} style={styles.listItem}>
+                • {ing}
+              </Text>
+            ))}
+
+            <Text style={styles.sectionTitle}>Pasos:</Text>
+            {recipe.pasos?.map((paso, index) => (
+              <Text key={index} style={styles.listItem}>
+                {index + 1}. {paso}
+              </Text>
+            ))}
+
+            <Text style={styles.timeText}>⏱️ Tiempo: {recipe.tiempo}</Text>
+          </View>
+        )}
         {/* <View>
           <Text style={styles.title}>Create Your Ship</Text>
           <Text style={styles.subtitle}>
@@ -260,7 +326,8 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     padding: 10,
     borderRadius: 6,
-    color: '#ffffffff',
+    backgroundColor: '#ffffff',
+    color: '#000000ff',
   },
   inputError: {
     borderColor: 'red',
@@ -296,5 +363,38 @@ const styles = StyleSheet.create({
     color: '#0A1A2F', // azul marino (contraste perfecto)
     fontWeight: '600',
     fontSize: 16,
+  },
+  recipeCard: {
+    backgroundColor: '#D1FAE5',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 20,
+    borderWidth: 2,
+    borderColor: '#6EE7B7',
+  },
+  recipeTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1F2937',
+    marginBottom: 10,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#1F2937',
+    marginTop: 15,
+    marginBottom: 8,
+  },
+  listItem: {
+    fontSize: 14,
+    color: '#374151',
+    marginBottom: 5,
+    lineHeight: 20,
+  },
+  timeText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#059669',
+    marginTop: 15,
   },
 });

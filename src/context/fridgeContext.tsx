@@ -87,7 +87,7 @@ export const useFridgeAPI = () => {
     try {
       const { token } = await getAuthData();
 
-      const response = await fetch(`${API_URL}/${id}`, {
+      const response = await fetch(`${API_URL}/updateFridgeById/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -140,6 +140,40 @@ export const useFridgeAPI = () => {
     }
   };
 
+  const generateRecipe = async (time, style) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { token, userId } = await getAuthData();
+
+      const response = await fetch('http://localhost:5000/api/recipe/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          userId,
+          time,
+          style,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Error generando receta');
+      }
+
+      return data.recipe;
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     loading,
     error,
@@ -147,5 +181,6 @@ export const useFridgeAPI = () => {
     getFridgeItemsById,
     updateFridgeItem,
     deleteFridgeItem,
+    generateRecipe,
   };
 };

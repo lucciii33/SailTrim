@@ -20,15 +20,30 @@ import { PrimaryButton } from '../components/PrimaryButton';
 import { useFridgeAPI } from '../context/fridgeContext';
 import ModalWrapper from '../components/ModalWrapper';
 import AddIngredientForm from '../components/AddIngredientForm';
+import { ModalConfirmDelete } from '../components/ModalConfirmDelete';
+import { ModalEdit } from '../components/ModalEdit';
+import EditIngredientForm from '../components/EditIngredientForm';
 
 export default function Fridge({ navigation }) {
   type RootStackParamList = {
     Dashboard: undefined;
   };
-  const { loading, getFridgeItemsById, createFridgeItem, deleteFridgeItem } =
-    useFridgeAPI();
+  const {
+    loading,
+    getFridgeItemsById,
+    createFridgeItem,
+    deleteFridgeItem,
+    updateFridgeItem,
+    generateRecipe,
+  } = useFridgeAPI();
   const [modalVisible, setModalVisible] = useState(false);
   const [fridgeItems, setFridgeItems] = useState([]);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
+  const [modalScanOrManual, setModalScanOrManual] = useState('');
+  const [modalEdit, setModalEdit] = useState(false);
+  const [editId, setEditId] = useState(null);
+  const [tempEditData, setTempEditData] = useState(null);
 
   const handleSaveItems = async items => {
     try {
@@ -86,6 +101,23 @@ export default function Fridge({ navigation }) {
     }
   };
 
+  const editItemFunc = async (id, formData) => {
+    try {
+      await updateFridgeItem(id, formData);
+      Alert.alert('Éxito', 'Ingrediente actualizado');
+
+      // Actualizamos el estado local: buscamos el ID y reemplazamos sus datos
+      setFridgeItems(prevItems =>
+        prevItems.map(item =>
+          item._id === id ? { ...item, ...formData } : item,
+        ),
+      );
+      setModalEdit(false); // Cerramos el modal al terminar
+    } catch (error) {
+      Alert.alert('Error', 'No se pudo actualizar');
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.cardContainer}>
@@ -111,10 +143,22 @@ export default function Fridge({ navigation }) {
       </View>
       <View style={{ flexDirection: 'row', gap: 10, justifyContent: 'center' }}>
         <View style={{ width: '45%' }}>
-          <PrimaryButton title="Scan" onPress={() => setModalVisible(true)} />
+          <PrimaryButton
+            title="Scan"
+            onPress={() => {
+              setModalVisible(true);
+              setModalScanOrManual('scan');
+            }}
+          />
         </View>
         <View style={{ width: '45%' }}>
-          <PrimaryButton title="Manual" onPress={() => setModalVisible(true)} />
+          <PrimaryButton
+            title="Manual"
+            onPress={() => {
+              setModalVisible(true);
+              setModalScanOrManual('manual');
+            }}
+          />
         </View>
       </View>
       <ScrollView>
@@ -141,9 +185,20 @@ export default function Fridge({ navigation }) {
                   name="trash"
                   size={24}
                   color="#000"
-                  onPress={() => removeItemFunc(item._id)}
+                  onPress={() => {
+                    setItemToDelete(item._id);
+                    setIsDeleteModalVisible(true);
+                  }}
                 />
-                <Icon name="pencil" size={24} color="#000" />
+                <Icon
+                  name="pencil"
+                  size={24}
+                  color="#000"
+                  onPress={() => {
+                    setModalEdit(true);
+                    setEditId(item._id);
+                  }}
+                />
               </View>
             </View>
           </View>
@@ -155,11 +210,44 @@ export default function Fridge({ navigation }) {
       >
         <View>
           <Text>Agregar Ingrediente</Text>
-          <AddIngredientForm onAdd={handleSaveItems} />
+          {modalScanOrManual === 'scan' && (
+            <View>
+              <Text>
+                Escáner de código de barras (pendiente de implementar)
+              </Text>
+            </View>
+          )}
+          {modalScanOrManual === 'manual' && (
+            <View>
+              {' '}
+              <AddIngredientForm onAdd={handleSaveItems} />
+            </View>
+          )}
 
           {/* Acá va el formulario */}
         </View>
       </ModalWrapper>
+      <ModalConfirmDelete
+        visible={isDeleteModalVisible}
+        nombreItem=""
+        onClose={() => setIsDeleteModalVisible(false)}
+        onConfirm={() => {
+          removeItemFunc(itemToDelete);
+          setIsDeleteModalVisible(false);
+        }}
+      />
+      <ModalEdit
+        visible={modalEdit}
+        onClose={() => setModalEdit(false)}
+        alGuardar={() => editItemFunc(editId, tempEditData)}
+      >
+        {editId && (
+          <EditIngredientForm
+            item={fridgeItems.find(i => i._id === editId)}
+            onInfoChange={info => setTempEditData(info)}
+          />
+        )}
+      </ModalEdit>
     </View>
   );
 }
