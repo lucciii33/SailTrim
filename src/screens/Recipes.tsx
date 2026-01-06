@@ -17,10 +17,14 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { useFridgeAPI } from '../context/fridgeContext';
 import { useRecipeAPI } from '../context/recipeContext';
+import { ModalConfirmDelete } from '../components/ModalConfirmDelete';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 export default function RecipeScreen({ navigation }) {
   const [recipes, setRecipes] = useState('');
-  const { getRecipeItemsByUserId } = useRecipeAPI();
+  const [recipeId, setRecipeId] = useState('');
+  const { getRecipeItemsByUserId, deleteRecipeItem } = useRecipeAPI();
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
 
   const getRecipesByUser = async () => {
     const items = await getRecipeItemsByUserId();
@@ -30,6 +34,15 @@ export default function RecipeScreen({ navigation }) {
   useEffect(() => {
     getRecipesByUser();
   }, []);
+
+  const deleteRecipiByid = async id => {
+    try {
+      await deleteRecipeItem(id);
+      setRecipes(recipes.filter(recipe => recipe._id !== id));
+    } catch (error) {
+      Alert.alert('Error', 'No se pudo eliminar la receta.');
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -48,11 +61,29 @@ export default function RecipeScreen({ navigation }) {
                 >
                   <Text style={styles.recipeTitle}>{recipe.name}</Text>
                   <Text style={styles.subtitle}>{recipe.time}</Text>
+                  <Icon
+                    name="trash"
+                    size={24}
+                    color="#000"
+                    onPress={() => {
+                      setRecipeId(recipe._id);
+                      setIsDeleteModalVisible(true);
+                    }}
+                  />
                 </TouchableOpacity>
               );
             })
           : 'No hay recetas disponibles.'}
       </ScrollView>
+      <ModalConfirmDelete
+        visible={isDeleteModalVisible}
+        nombreItem=""
+        onClose={() => setIsDeleteModalVisible(false)}
+        onConfirm={() => {
+          deleteRecipiByid(recipeId);
+          setIsDeleteModalVisible(false);
+        }}
+      />
     </View>
   );
 }
