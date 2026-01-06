@@ -16,11 +16,13 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { useFridgeAPI } from '../context/fridgeContext';
+import { useRecipeAPI } from '../context/recipeContext';
 
 export default function DashboardScreen({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [recipe, setRecipe] = useState('');
   const { loading, generateRecipe } = useFridgeAPI();
+  const { createRecipeItem } = useRecipeAPI();
   const [formData, setFormData] = useState({
     time: '',
     style: '',
@@ -43,6 +45,7 @@ export default function DashboardScreen({ navigation }) {
       Alert.alert('Error', 'No se pudo generar la receta');
     }
   };
+
   // const createShip = async () => {
   //   try {
   //     const token = await AsyncStorage.getItem('token');
@@ -61,7 +64,7 @@ export default function DashboardScreen({ navigation }) {
   //       owner: userId,
   //     };
 
-  //     const res = await fetch('http://127.0.0.1:5000/api/ship/createShip', {
+  //     const res = await fetch('http://192.168.0.221:5000/api/ship/createShip', {
   //       method: 'POST',
   //       headers: {
   //         'Content-Type': 'application/json',
@@ -70,7 +73,11 @@ export default function DashboardScreen({ navigation }) {
   //       body: JSON.stringify(body),
   //     });
 
+  //     Alert.alert('Debug Status', `${res.status}`);
+
   //     const data = await res.json();
+
+  //     Alert.alert('Debug Response', JSON.stringify(data));
 
   //     if (!res.ok) {
   //       Alert.alert('Error', data.message || 'No se pudo crear el barco');
@@ -80,54 +87,9 @@ export default function DashboardScreen({ navigation }) {
   //     Alert.alert('Success', 'Ship created successfully!');
   //     resetForm();
   //   } catch (err) {
-  //     console.log(err);
-  //     Alert.alert('Error', 'Hubo un problema creando el barco');
+  //     Alert.alert('ERROR', `${err.message}`);
   //   }
   // };
-  const createShip = async () => {
-    try {
-      const token = await AsyncStorage.getItem('token');
-      const userDataString = await AsyncStorage.getItem('userData');
-
-      if (!token || !userDataString) {
-        Alert.alert('Error', 'No hay datos de usuario');
-        return;
-      }
-
-      const user = JSON.parse(userDataString);
-      const userId = user._id;
-
-      const body = {
-        ...form,
-        owner: userId,
-      };
-
-      const res = await fetch('http://192.168.0.221:5000/api/ship/createShip', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(body),
-      });
-
-      Alert.alert('Debug Status', `${res.status}`);
-
-      const data = await res.json();
-
-      Alert.alert('Debug Response', JSON.stringify(data));
-
-      if (!res.ok) {
-        Alert.alert('Error', data.message || 'No se pudo crear el barco');
-        return;
-      }
-
-      Alert.alert('Success', 'Ship created successfully!');
-      resetForm();
-    } catch (err) {
-      Alert.alert('ERROR', `${err.message}`);
-    }
-  };
 
   const { form, handleChange, validate, resetForm, errors } = useForm(
     {
@@ -166,6 +128,21 @@ export default function DashboardScreen({ navigation }) {
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const navegateToFridge = () => {
     navigationMyShips.navigate('Fridge');
+  };
+
+  const handleSaveRecipe = async () => {
+    try {
+      await createRecipeItem({
+        name: recipe.nombre,
+        ingredientes: recipe.ingredientes,
+        pasos: recipe.pasos,
+        time: recipe.tiempo,
+      });
+      navigation.navigate('Recipes');
+      Alert.alert('Éxito', 'Receta guardada');
+    } catch (error) {
+      Alert.alert('Error', 'No se pudo guardar');
+    }
   };
 
   return (
@@ -211,8 +188,17 @@ export default function DashboardScreen({ navigation }) {
             ))}
 
             <Text style={styles.timeText}>⏱️ Tiempo: {recipe.tiempo}</Text>
+            <PrimaryButton
+              title="💾 Guardar Receta"
+              onPress={handleSaveRecipe}
+            />
           </View>
         )}
+        <PrimaryButton
+          title="ir a la nevera"
+          onPress={() => navegateToFridge()}
+        />
+
         {/* <View>
           <Text style={styles.title}>Create Your Ship</Text>
           <Text style={styles.subtitle}>
@@ -306,7 +292,11 @@ export default function DashboardScreen({ navigation }) {
           <Text style={styles.buttonText}>Create Ship</Text>
         </TouchableOpacity>
        */}
-        <Button title="test" onPress={() => navegateToFridge()} />
+
+        <PrimaryButton
+          title="📚 Ver mis recetas"
+          onPress={() => navigation.navigate('Recipes')}
+        />
       </ScrollView>
     </View>
   );
@@ -341,7 +331,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#F2F5F7', // blanco náutico
+    color: '#F2F5F7',
     textAlign: 'center',
     marginBottom: 8,
   },
@@ -360,7 +350,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   buttonText: {
-    color: '#0A1A2F', // azul marino (contraste perfecto)
+    color: '#0A1A2F',
     fontWeight: '600',
     fontSize: 16,
   },
